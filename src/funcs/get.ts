@@ -1,0 +1,165 @@
+export const domain='ddu6.xyz'
+export interface HoleData{
+    text:string|null|undefined
+    tag:string|null|undefined
+    pid:number|string
+    timestamp:number|string
+    reply:number|string
+    likenum:number|string
+    type:string|null|undefined
+    url:string|null|undefined
+    hidden:'1'|'0'|1|0|boolean
+    etimestamp:number|string|undefined
+}
+export interface CommentData{
+    text:string|null|undefined
+    tag:string|null|undefined
+    cid:number|string
+    pid:number|string
+    timestamp:number|string
+    name:string|null|undefined
+}
+export type Order='id'|'active'|'hot'
+async function getResult(path:string,params:Record<string,string>={},timeout=30000){
+    const result=await new Promise(async(resolve:(val:{data:any}|number)=>void)=>{
+        let paramsStr=new URLSearchParams(params).toString()
+        if(paramsStr.length>0)paramsStr='?'+paramsStr
+        setTimeout(()=>{
+            resolve(503)
+        },timeout)
+        try{
+            const res=await fetch(`https://${domain}/services/ph-get/${path}${paramsStr}`)
+            if(res.status!==200){
+                resolve(500)
+                return
+            }
+            const {status,data}=await res.json()
+            if(status===200){
+                resolve({data:data})
+                return
+            }
+            if(typeof status==='number'){
+                resolve(status)
+                return
+            }
+        }catch(err){
+            console.log(err)
+        }
+        resolve(500)
+    })
+    return result
+}
+async function basicallyGetComments(id:number|string,token:string){
+    const result:{data:CommentData[]}|number=await getResult(`c${id}`,{
+        update:'',
+        token:token
+    })
+    return result
+}
+async function basicallyGetLocalComments(id:number|string){
+    const result:{data:CommentData[]}|number=await getResult(`local/c${id}`)
+    return result
+}
+async function basicallyGetHole(id:number|string,token:string){
+    const result:{data:HoleData}|number=await getResult(`h${id}`,{
+        update:'',
+        token:token
+    })
+    return result
+}
+async function basicallyGetLocalHole(id:number|string){
+    const result:{data:HoleData}|number=await getResult(`local/h${id}`)
+    return result
+}
+async function basicallyGetPage(key:string,page:number|string,token:string){
+    const result:{data:HoleData[]}|number=await getResult(`p${page}`,{
+        update:'',
+        key:key,
+        token:token
+    })
+    return result
+}
+async function basicallyGetLocalPage(key:string,page:number|string,order:Order,s:number,e:number){
+    const result:{data:HoleData[]}|number=await getResult(`local/p${page}`,{
+        key:key,
+        order:order,
+        s:s.toString(),
+        e:e.toString()
+    })
+    return result
+}
+export async function getComments(id:number|string,token:string,reply:number,hidden:number,localCommentsThreshod:number){
+    if(reply===0)return []
+    const result0=await basicallyGetLocalComments(id)
+    if(result0===503)return 503
+    if(typeof result0==='number')return 500
+    const data0=result0.data
+    if(token.length===0||hidden===1)return data0
+    if(data0.length>=reply||data0.length>=localCommentsThreshod)return data0
+    const result1=await basicallyGetComments(id,token)
+    if(result1===503)return 503
+    if(result1===404)return data0
+    if(typeof result1==='number')return 500
+    return result1.data
+}
+export async function getHole(id:number|string,token:string){
+    const result0=await basicallyGetLocalHole(id)
+    if(result0===503)return 503
+    if(result0===404){
+        if(token.length===0)return 404
+        const result1=await basicallyGetHole(id,token)
+        if(result1===503)return 503
+        if(result1===404)return 404
+        if(typeof result1==='number')return 500
+        return result1.data
+    }
+    if(typeof result0==='number')return 500
+    const data0=result0.data
+    if(Number(data0.timestamp)===0)return 404
+    if(Number(data0.hidden)===1)return data0
+    if(token.length===0)return data0
+    const result1=await basicallyGetHole(id,token)
+    if(result1===503)return 503
+    if(result1===404)return data0
+    if(typeof result1==='number')return 500
+    return result1.data
+}
+export async function star(id:number|string,starred:boolean,token:string){
+    if(token.length===0)return 401
+    const result=await getResult(`s${id}`,starred?{'starred':'',token:token}:{token:token})
+    if(typeof result!=='number')return 200
+    if(result===503)return 503
+    if(result===404)return 404
+    return 500
+}
+export async function getPage(key:string,page:number|string,order:Order,s:number,e:number,token:string){
+    if(order==='id'&&token.length>0){
+        const result=await basicallyGetPage(key,page,token)
+        if(result===503)return 503
+        if(result===404)return []
+        if(typeof result==='number')return 500
+        return result.data
+    }
+    const result=await basicallyGetLocalPage(key,page,order,s,e)
+    if(result===503)return 503
+    if(typeof result==='number')return 500
+    return result.data
+}
+export async function getIds(start:number){
+    const result:{data:number[]}|number=await getResult(`local/ids${start}`)
+    if(result===503)return 503
+    if(typeof result==='number')return 500
+    return result.data
+}
+export async function getCIds(start:number){
+    const result:{data:number[]}|number=await getResult(`local/cids${start}`)
+    if(result===503)return 503
+    if(typeof result==='number')return 500
+    return result.data
+}
+export async function getInfo(){
+    const result:{data:{maxId:number,maxCId:number}}|number=await getResult(`local/info`)
+    if(result===503)return 503
+    if(typeof result==='number')return 500
+    return result.data
+}
