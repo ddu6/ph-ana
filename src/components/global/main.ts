@@ -5,6 +5,7 @@ export class Main{
     style=document.createElement('style')
     cmdInput=document.createElement('input')
     console=document.createElement('div')
+    cmd=''
     constructor(){
         const {element,style,cmdInput,console}=this
         style.textContent=css.main
@@ -24,8 +25,12 @@ export class Main{
     }
     async exec(){
         const {cmdInput,console}=this
-        const cmd=cmdInput.value.trim()
+        const tmpCmd=cmdInput.value.trim()
         cmdInput.value=''
+        if(tmpCmd.length>0){
+            this.cmd=tmpCmd
+        }
+        const {cmd}=this
         const itemEle=document.createElement('div')
         const descEle=document.createElement('div')
         descEle.textContent=`${getDate()}  ${cmd}`
@@ -41,6 +46,10 @@ export class Main{
         if(result instanceof Error){
             contentEle.textContent='Error. '+result.message
             itemEle.classList.add('err')
+            return
+        }
+        if(typeof result==='string'){
+            contentEle.textContent=result
             return
         }
         contentEle.textContent=''
@@ -66,7 +75,7 @@ function paintIds(data:number[]){
     if(ctx===null)throw new Error()
     ctx.scale(scale,scale)
     ctx.fillStyle='rgb(30,30,30)'
-    data=data.map(val=>val%batchSize)
+    data=data.map(val=>val%batchSize+1)
     for(let i=0;i<data.length;i++){
         const n=data[i]-1
         const x=n%width
@@ -81,6 +90,40 @@ function paintIds(data:number[]){
         ctx.fillRect(x,0,0.1,height)
     }
     return canvas
+}
+function idsToRIds(data:number[],start:number){
+    const batchSize=10000
+    data=data.map(val=>val%batchSize)
+    start*=batchSize
+    const ids:Record<number,boolean>={}
+    for(let i=0;i<data.length;i++){
+        ids[data[i]]=true
+    }
+    let s=0
+    const array:{s:number,e:number}[]=[]
+    for(let i=0;i<batchSize;i++){
+        if(!ids[i])continue
+        if(s===i){
+            s++
+            continue
+        }
+        array.push({
+            s:start+s,
+            e:start+i-1
+        })
+        s=i+1
+    }
+    if(s!==batchSize){
+        array.push({
+            s:start+s,
+            e:start+batchSize-1
+        })
+    }
+    return array.map(val=>{
+        const {s,e}=val
+        if(s===e)return `#${s}`
+        return `#${s}-${e}`
+    }).join(' ')
 }
 async function basicallyExec(cmd:string){
     if(cmd.startsWith('ids')){
@@ -97,13 +140,25 @@ async function basicallyExec(cmd:string){
         if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
         return paintIds(data)
     }
+    if(cmd.startsWith('rids')){
+        const start=Number(cmd.slice(4))
+        if(isNaN(start))return new Error('Invalid cmd.')
+        const data=await getIds(start)
+        if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
+        return idsToRIds(data,start)
+    }
+    if(cmd.startsWith('rcids')){
+        const start=Number(cmd.slice(5))
+        if(isNaN(start))return new Error('Invalid cmd.')
+        const data=await getCIds(start)
+        if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
+        return idsToRIds(data,start)
+    }
     if(cmd==='info'){
         const data=await getInfo()
         if(typeof data==='number')return new Error(`${data}. Fail to get info.`)
         const {maxId,maxCId}=data
-        const infoEle=document.createElement('div')
-        infoEle.textContent=`max-id ${maxId}, max-cid ${maxCId}`
-        return infoEle
+        return `max-id ${maxId}, max-cid ${maxCId}`
     }
     return new Error('Invalid cmd.')
 }
