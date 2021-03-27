@@ -6,6 +6,8 @@ export class Main{
     cmdInput=document.createElement('input')
     console=document.createElement('div')
     cmd=''
+    token=''
+    password=''
     constructor(){
         const {element,style,cmdInput,console}=this
         style.textContent=css.main
@@ -21,7 +23,14 @@ export class Main{
         element.append(console)
     }
     async init(){
-
+        const token=window.localStorage.getItem('ph-token')
+        if(typeof token==='string'&&token.length===32){
+            this.token=token
+        }
+        const password=window.localStorage.getItem('ph-password')
+        if(typeof password==='string'&&password.length>0){
+            this.password=password
+        }
     }
     async exec(){
         const {cmdInput,console}=this
@@ -42,7 +51,7 @@ export class Main{
         itemEle.append(descEle)
         itemEle.append(contentEle)
         console.prepend(itemEle)
-        const result=await basicallyExec(cmd)
+        const result=await this.basicallyExec(cmd)
         if(result instanceof Error){
             contentEle.textContent='Error. '+result.message
             itemEle.classList.add('err')
@@ -54,6 +63,60 @@ export class Main{
         }
         contentEle.textContent=''
         contentEle.append(result)
+    }
+    async basicallyExec(cmd:string){
+        const {password}=this
+        if(password.length===0)return new Error('401.')
+        if(cmd.startsWith('ids')){
+            const start=Number(cmd.slice(3))
+            if(isNaN(start))return new Error('Invalid cmd.')
+            const data=await getIds(start,password)
+            if(data===401){
+                this.password=''
+            }
+            if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
+            return paintIds(data)
+        }
+        if(cmd.startsWith('cids')){
+            const start=Number(cmd.slice(4))
+            if(isNaN(start))return new Error('Invalid cmd.')
+            const data=await getCIds(start,password)
+            if(data===401){
+                this.password=''
+            }
+            if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
+            return paintIds(data)
+        }
+        if(cmd.startsWith('rids')){
+            const start=Number(cmd.slice(4))
+            if(isNaN(start))return new Error('Invalid cmd.')
+            const data=await getIds(start,password)
+            if(data===401){
+                this.password=''
+            }
+            if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
+            return idsToRIds(data,start)
+        }
+        if(cmd.startsWith('rcids')){
+            const start=Number(cmd.slice(5))
+            if(isNaN(start))return new Error('Invalid cmd.')
+            const data=await getCIds(start,password)
+            if(data===401){
+                this.password=''
+            }
+            if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
+            return idsToRIds(data,start)
+        }
+        if(cmd==='info'){
+            const data=await getInfo(password)
+            if(data===401){
+                this.password=''
+            }
+            if(typeof data==='number')return new Error(`${data}. Fail to get info.`)
+            const {maxId,maxCId}=data
+            return `max-id ${maxId}, max-cid ${maxCId}`
+        }
+        return new Error('Invalid cmd.')
     }
 }
 function getDate(){
@@ -124,41 +187,4 @@ function idsToRIds(data:number[],start:number){
         if(s===e)return `#${s}`
         return `#${s}-${e}`
     }).join(' ')
-}
-async function basicallyExec(cmd:string){
-    if(cmd.startsWith('ids')){
-        const start=Number(cmd.slice(3))
-        if(isNaN(start))return new Error('Invalid cmd.')
-        const data=await getIds(start)
-        if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
-        return paintIds(data)
-    }
-    if(cmd.startsWith('cids')){
-        const start=Number(cmd.slice(4))
-        if(isNaN(start))return new Error('Invalid cmd.')
-        const data=await getCIds(start)
-        if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
-        return paintIds(data)
-    }
-    if(cmd.startsWith('rids')){
-        const start=Number(cmd.slice(4))
-        if(isNaN(start))return new Error('Invalid cmd.')
-        const data=await getIds(start)
-        if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
-        return idsToRIds(data,start)
-    }
-    if(cmd.startsWith('rcids')){
-        const start=Number(cmd.slice(5))
-        if(isNaN(start))return new Error('Invalid cmd.')
-        const data=await getCIds(start)
-        if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
-        return idsToRIds(data,start)
-    }
-    if(cmd==='info'){
-        const data=await getInfo()
-        if(typeof data==='number')return new Error(`${data}. Fail to get info.`)
-        const {maxId,maxCId}=data
-        return `max-id ${maxId}, max-cid ${maxCId}`
-    }
-    return new Error('Invalid cmd.')
 }
