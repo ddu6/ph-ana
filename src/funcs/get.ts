@@ -28,8 +28,10 @@ async function getResult(path:string,params:Record<string,string>={},timeout=300
     })
     return result
 }
-export async function getIds(start:number,password:string){
+export async function getIds(start:number,token:string,password:string){
+    if(token.length===0||password.length===0)return 401
     const result:{data:number[]}|number=await getResult(`local/ids${start}`,{
+        token:token,
         password:password
     })
     if(result===503)return 503
@@ -37,8 +39,10 @@ export async function getIds(start:number,password:string){
     if(typeof result==='number')return 500
     return result.data
 }
-export async function getCIds(start:number,password:string){
+export async function getCIds(start:number,token:string,password:string){
+    if(token.length===0||password.length===0)return 401
     const result:{data:number[]}|number=await getResult(`local/cids${start}`,{
+        token:token,
         password:password
     })
     if(result===503)return 503
@@ -46,8 +50,10 @@ export async function getCIds(start:number,password:string){
     if(typeof result==='number')return 500
     return result.data
 }
-export async function getInfo(password:string){
+export async function getInfo(token:string,password:string){
+    if(token.length===0||password.length===0)return 401
     const result:{data:{maxId:number,maxCId:number}}|number=await getResult(`local/info`,{
+        token:token,
         password:password
     })
     if(result===503)return 503

@@ -65,13 +65,14 @@ export class Main{
         contentEle.append(result)
     }
     async basicallyExec(cmd:string){
-        const {password}=this
-        if(password.length===0)return new Error('401.')
+        const {password,token}=this
+        if(password.length===0||token.length===0)return new Error('401.')
         if(cmd.startsWith('ids')){
             const start=Number(cmd.slice(3))
             if(isNaN(start))return new Error('Invalid cmd.')
-            const data=await getIds(start,password)
+            const data=await getIds(start,token,password)
             if(data===401){
+                this.token=''
                 this.password=''
             }
             if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
@@ -80,8 +81,9 @@ export class Main{
         if(cmd.startsWith('cids')){
             const start=Number(cmd.slice(4))
             if(isNaN(start))return new Error('Invalid cmd.')
-            const data=await getCIds(start,password)
+            const data=await getCIds(start,token,password)
             if(data===401){
+                this.token=''
                 this.password=''
             }
             if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
@@ -90,8 +92,9 @@ export class Main{
         if(cmd.startsWith('rids')){
             const start=Number(cmd.slice(4))
             if(isNaN(start))return new Error('Invalid cmd.')
-            const data=await getIds(start,password)
+            const data=await getIds(start,token,password)
             if(data===401){
+                this.token=''
                 this.password=''
             }
             if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
@@ -100,16 +103,18 @@ export class Main{
         if(cmd.startsWith('rcids')){
             const start=Number(cmd.slice(5))
             if(isNaN(start))return new Error('Invalid cmd.')
-            const data=await getCIds(start,password)
+            const data=await getCIds(start,token,password)
             if(data===401){
+                this.token=''
                 this.password=''
             }
             if(typeof data==='number')return new Error(`${data}. Fail to get cids.`)
             return idsToRIds(data,start)
         }
         if(cmd==='info'){
-            const data=await getInfo(password)
+            const data=await getInfo(token,password)
             if(data===401){
+                this.token=''
                 this.password=''
             }
             if(typeof data==='number')return new Error(`${data}. Fail to get info.`)
