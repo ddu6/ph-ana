@@ -142,7 +142,7 @@ function paintIds(data:number[]){
     const ctx=canvas.getContext('2d')
     if(ctx===null)throw new Error()
     ctx.scale(scale,scale)
-    ctx.fillStyle='rgb(30,30,30)'
+    ctx.fillStyle='#6ec0ec'
     data=data.map(val=>val%batchSize+1)
     for(let i=0;i<data.length;i++){
         const n=data[i]-1
@@ -150,7 +150,7 @@ function paintIds(data:number[]){
         const y=(n-x)/width
         ctx.fillRect(x,y,1,1)
     }
-    ctx.fillStyle='grey'
+    ctx.fillStyle='#3074ac'
     for(let i=0;i<10;i++){
         const y=i*subHeight+(subHeight-0.1)
         const x=i*subWidth+(subWidth-0.1)
