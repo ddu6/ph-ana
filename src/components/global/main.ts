@@ -67,17 +67,6 @@ export class Main{
     async basicallyExec(cmd:string){
         const {password,token}=this
         if(password.length===0||token.length===0)return new Error('401.')
-        if(cmd.startsWith('ids')){
-            const start=Number(cmd.slice(3))
-            if(isNaN(start))return new Error('Invalid cmd.')
-            const data=await getIds(start,token,password)
-            if(data===401){
-                this.token=''
-                this.password=''
-            }
-            if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
-            return paintIds(data)
-        }
         if(cmd.startsWith('cids')){
             const start=Number(cmd.slice(4))
             if(isNaN(start))return new Error('Invalid cmd.')
@@ -121,7 +110,18 @@ export class Main{
             const {maxId,maxCId}=data
             return `max-id ${maxId}, max-cid ${maxCId}`
         }
-        return new Error('Invalid cmd.')
+        if(cmd.startsWith('ids')){
+            cmd=cmd.slice(3)
+        }
+        const start=Number(cmd)
+        if(isNaN(start))return new Error('Invalid cmd.')
+        const data=await getIds(start,token,password)
+        if(data===401){
+            this.token=''
+            this.password=''
+        }
+        if(typeof data==='number')return new Error(`${data}. Fail to get ids.`)
+        return paintIds(data)
     }
 }
 function getDate(){
