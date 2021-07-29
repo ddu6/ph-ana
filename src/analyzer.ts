@@ -1,8 +1,8 @@
-import {Div, Shell} from '@ddu6/stui'
+import {CommonEle, Div, Shell} from '@ddu6/stui'
 import {all} from './lib/css'
 import {getIds,getCIds, getInfo} from './get'
 export class Analyzer extends Shell{
-    input=document.createElement('input')
+    input=new CommonEle('input')
     console=document.createElement('div')
     token=''
     password=''
@@ -21,8 +21,8 @@ export class Analyzer extends Shell{
         if(this.token===''||this.password===''){
             return
         }
-        const cmd=this.input.value.trim()
-        this.input.value=''
+        const cmd=this.input.element.value.trim()
+        this.input.element.value=''
         if(cmd.length===0){
             return
         }
@@ -33,7 +33,7 @@ export class Analyzer extends Shell{
         }
         const content=new Div()
         .setText('executing')
-        this.append(
+        this.input.after(
             new Div()
             .setText(`${getDate()}  ${cmd}`)
             .append(content)
