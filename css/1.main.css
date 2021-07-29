@@ -1,0 +1,10 @@
+.analyzer>*{
+    margin-bottom: var(--length-padding);
+    white-space: pre-wrap;
+}
+
+.density-view{
+    display: block;
+    width: 500px;
+    max-width: 100%;
+}

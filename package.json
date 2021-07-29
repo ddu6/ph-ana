@@ -1,12 +1,16 @@
 {
   "version": "0.1.8",
   "scripts": {
-    "build": "node scripts/pkg-css.js && webpack"
+    "build": "pkg && webpack"
   },
   "devDependencies": {
-    "ts-loader": "^9.2.3",
-    "typescript": "^4.3.2",
-    "webpack": "^5.38.1",
+    "@ddu6/pkg-tools": "^0.0.3",
+    "ts-loader": "^9.2.4",
+    "typescript": "^4.3.5",
+    "webpack": "^5.47.0",
     "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "@ddu6/stui": "^0.0.40"
   }
 }
