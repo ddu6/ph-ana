@@ -1,4 +1,4 @@
-.analyzer>*{
+.monitor>*{
     margin-bottom: var(--length-padding);
     white-space: pre-wrap;
 }

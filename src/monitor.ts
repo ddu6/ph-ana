@@ -1,13 +1,13 @@
 import {CommonEle, Div, Shell} from '@ddu6/stui'
 import {all} from './lib/css'
 import {getIds,getCIds, getInfo} from './get'
-export class Analyzer extends Shell{
+export class Monitor extends Shell{
     input=new CommonEle('input')
     console=document.createElement('div')
     token=''
     password=''
     constructor(){
-        super('PKU Holes Analyzer','https://pkuh6.github.io/imgs/pkuh-circle.png',all,['analyzer'])
+        super('PKU Holes Monitor','https://pkuh6.github.io/imgs/pkuh-circle.png',all,['monitor'])
         this.append(this.input)
         this.token=window.localStorage.getItem('ph-token')??''
         this.password=window.localStorage.getItem('ph-password')??''

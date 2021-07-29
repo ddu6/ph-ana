@@ -1,2 +1,2 @@
-import {Analyzer} from './analyzer'
-window.analyzer=new Analyzer()
+import {Monitor} from './monitor'
+window.monitor=new Monitor()

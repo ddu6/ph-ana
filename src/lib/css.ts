@@ -1,2 +1,2 @@
-export const main=".analyzer>*{\n    margin-bottom: var(--length-padding);\n    white-space: pre-wrap;\n}\n\n.density-view{\n    display: block;\n    width: 500px;\n    max-width: 100%;\n}"
+export const main=".monitor>*{\n    margin-bottom: var(--length-padding);\n    white-space: pre-wrap;\n}\n\n.density-view{\n    display: block;\n    width: 500px;\n    max-width: 100%;\n}"
 export const all=main
