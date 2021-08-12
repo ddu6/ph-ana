@@ -3,14 +3,11 @@ import {all} from './lib/css'
 import {getIds,getCIds, getInfo} from './get'
 export class Monitor extends Shell{
     input=new CommonEle('input')
-    console=document.createElement('div')
-    token=''
     password=''
     constructor(){
         super('PKU Holes Monitor','https://pkuh6.github.io/imgs/pkuh-circle.png',all,['monitor'])
         this.append(this.input)
-        this.token=window.localStorage.getItem('ph-token')??''
-        this.password=window.localStorage.getItem('ph-password')??''
+        this.password=localStorage.getItem('ph-password')??''
         addEventListener('keydown',async e=>{
             if(e.key==='Enter'){
                 await this.exec()
@@ -18,7 +15,7 @@ export class Monitor extends Shell{
         })
     }
     async exec(){
-        if(this.token===''||this.password===''){
+        if(this.password.length===0){
             return
         }
         const cmd=this.input.element.value.trim()
@@ -39,11 +36,7 @@ export class Monitor extends Shell{
             .append(content)
         )
         if(name==='info'){
-            const data=await getInfo(this.token,this.password)
-            if(data===401){
-                this.token=''
-                this.password=''
-            }
+            const data=await getInfo(this.password)
             if(typeof data==='number'){
                 content.setText(`${data}`)
                 return
@@ -53,11 +46,7 @@ export class Monitor extends Shell{
             return
         }
         if(name==='ids'||name===''){
-            const data=await getIds(number,this.token,this.password)
-            if(data===401){
-                this.token=''
-                this.password=''
-            }
+            const data=await getIds(number,this.password)
             if(typeof data==='number'){
                 content.setText(`${data}`)
                 return
@@ -68,11 +57,7 @@ export class Monitor extends Shell{
             return
         }
         if(name==='cids'){
-            const data=await getCIds(number,this.token,this.password)
-            if(data===401){
-                this.token=''
-                this.password=''
-            }
+            const data=await getCIds(number,this.password)
             if(typeof data==='number'){
                 content.setText(`${data}`)
                 return
@@ -83,11 +68,7 @@ export class Monitor extends Shell{
             return
         }
         if(name==='rids'){
-            const data=await getIds(number,this.token,this.password)
-            if(data===401){
-                this.token=''
-                this.password=''
-            }
+            const data=await getIds(number,this.password)
             if(typeof data==='number'){
                 content.setText(`${data}`)
                 return
@@ -96,11 +77,7 @@ export class Monitor extends Shell{
             return
         }
         if(name==='rcids'){
-            const data=await getCIds(number,this.token,this.password)
-            if(data===401){
-                this.token=''
-                this.password=''
-            }
+            const data=await getCIds(number,this.password)
             if(typeof data==='number'){
                 content.setText(`${data}`)
                 return
