@@ -40,7 +40,7 @@ export class Monitor extends Shell{
         .setText('executing')
         this.input.after(
             new Div()
-            .setText(`${getDate()}  ${cmd}`)
+            .setText(`${getTime()}  ${cmd}`)
             .append(content)
         )
         if(name==='info'){
@@ -95,23 +95,15 @@ export class Monitor extends Shell{
         }
     }
 }
-function getDate(){
+function getTime(){
     const date=new Date()
     return [
-        date.getMonth()+1,
-        date.getDate()
-    ]
-    .map(val=>val.toString().padStart(2,'0'))
-    .join('-')
-    +' '
-    +[
-        date.getHours(),date.getMinutes(),
+        date.getHours(),
+        date.getMinutes(),
         date.getSeconds()
     ]
     .map(val=>val.toString().padStart(2,'0'))
     .join(':')
-    +':'
-    +date.getMilliseconds().toString().padStart(3,'0')
 }
 function paintIds(data:number[]){
     const batchSize=10000
