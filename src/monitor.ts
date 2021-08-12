@@ -5,9 +5,17 @@ export class Monitor extends Shell{
     input=new CommonEle('input')
     password=''
     constructor(){
-        super('PKU Holes Monitor','https://pkuh6.github.io/imgs/pkuh-circle.png',all,['monitor'])
+        super('PKU Holes Monitor','https://pkuh6.github.io/imgs/pkuh-circle.png',all,['monitor','form'])
         this.append(this.input)
         this.password=localStorage.getItem('ph-password')??''
+        document.documentElement.dataset.colorScheme
+        =localStorage.getItem('ph-color-scheme')
+        ??document.documentElement.dataset.colorScheme
+        ??'auto'
+        document.documentElement.dataset.fontSize
+        =localStorage.getItem('ph-font-size')
+        ??document.documentElement.dataset.fontSize
+        ??'small'
         addEventListener('keydown',async e=>{
             if(e.key==='Enter'){
                 await this.exec()
@@ -121,20 +129,17 @@ function paintIds(data:number[]){
         throw new Error()
     }
     ctx.scale(scale,scale)
-    ctx.fillStyle='#6ec0ec'
-    data=data.map(val=>val%batchSize+1)
-    for(let i=0;i<data.length;i++){
-        const n=data[i]-1
+    const style=getComputedStyle(document.documentElement)
+    ctx.fillStyle=style.getPropertyValue('--color-variable')
+    for(const id of data){
+        const n=id%batchSize
         const x=n%width
-        const y=(n-x)/width
-        ctx.fillRect(x,y,1,1)
+        ctx.fillRect(x,(n-x)/width,1,1)
     }
-    ctx.fillStyle='#3074ac'
-    for(let i=0;i<10;i++){
-        const y=i*subHeight+(subHeight-0.1)
-        const x=i*subWidth+(subWidth-0.1)
-        ctx.fillRect(0,y,width,0.1)
-        ctx.fillRect(x,0,0.1,height)
+    ctx.fillStyle=style.getPropertyValue('--color-modifier')
+    for(let i=0;i<=10;i++){
+        ctx.fillRect(0,i*subHeight-0.05,width,0.1)
+        ctx.fillRect(i*subWidth-0.05,0,0.1,height)
     }
     return canvas
 }

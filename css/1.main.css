@@ -1,5 +1,7 @@
-.monitor>*{
-    margin-bottom: var(--length-padding);
+.monitor {
+    padding: var(--length-padding);
+    max-width: var(--length-width);
+    margin: 0 auto;
     white-space: pre-wrap;
 }
 
