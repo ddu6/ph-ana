@@ -121,8 +121,8 @@ function paintIds(data:number[]){
     const subHeight=height/10
     const scale=10
     const canvas=document.createElement('canvas')
-    canvas.width=width*scale
-    canvas.height=height*scale
+    canvas.width=(width+0.2)*scale
+    canvas.height=(height+0.2)*scale
     canvas.classList.add('density-view')
     const ctx=canvas.getContext('2d')
     if(ctx===null){
@@ -134,12 +134,12 @@ function paintIds(data:number[]){
     for(const id of data){
         const n=id%batchSize
         const x=n%width
-        ctx.fillRect(x,(n-x)/width,1,1)
+        ctx.fillRect(x+0.1,(n-x)/width+0.1,1,1)
     }
     ctx.fillStyle=style.getPropertyValue('--color-modifier')
     for(let i=0;i<=10;i++){
-        ctx.fillRect(0,i*subHeight-0.05,width,0.1)
-        ctx.fillRect(i*subWidth-0.05,0,0.1,height)
+        ctx.fillRect(0,i*subHeight,width,0.2)
+        ctx.fillRect(i*subWidth,0,0.2,height)
     }
     return canvas
 }
