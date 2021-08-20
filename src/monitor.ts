@@ -75,7 +75,7 @@ export class Monitor extends Shell{
             .append(paintIds(data))
             return
         }
-        if(name==='rids'){
+        if(name==='rids'||name==='r'){
             const data=await getIds(number,this.password)
             if(typeof data==='number'){
                 content.setText(`${data}`)
@@ -93,6 +93,7 @@ export class Monitor extends Shell{
             content.setText(idsToRIds(data,number))
             return
         }
+        content.setText('400')
     }
 }
 function getTime(){
@@ -168,8 +169,8 @@ function idsToRIds(data:number[],start:number){
     return array.map(val=>{
         const {s,e}=val
         if(s===e){
-            return `#${s}`
+            return s
         }
-        return `#${s}-${e}`
+        return `${s}-${e}`
     }).join(' ')
 }
